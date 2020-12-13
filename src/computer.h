@@ -577,7 +577,7 @@ struct Computer {
 
         Env<Type, N> env;
 
-        //check syntax
+        // Check syntax.
         T::check_program();
 
         // Parsing labels.
