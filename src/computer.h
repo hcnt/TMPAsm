@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <type_traits>
+#include <stdexcept>
 #include <limits>
 #include <cstdint>
 #include <cstddef>
@@ -39,7 +40,7 @@ namespace {
             return c - 'a' + 11;
         if ('A' <= c && c <= 'Z')
             return c - 'A' + 11;
-        throw "Character out of range";
+        throw std::runtime_error("Character out of range");
     }
 
     // struct D and Lea helper function, gets variable address whose Id is id.
@@ -158,11 +159,11 @@ constexpr uint64_t Id(const char s[]) {
         char_cnt++;
         base_power *= ALLOWED_CHAR_CNT;
         if (char_cnt > MAX_ID_LEN) {
-            throw "Id too long";
+            throw std::runtime_error("Id too long");
         }
     }
     if (char_cnt == 0) {
-        throw "Empty Id";
+        throw std::runtime_error("Empty Id");
     }
     return ans;
 }
@@ -189,7 +190,7 @@ struct Lea {
     constexpr static size_t get(Env<memType, memSize> &env) {
         size_t addr = get_addr<memSize>(id, env.addresses, env.variables_cnt);
         if (addr == env.variables_cnt) {
-            throw "Id not found";
+            throw std::runtime_error("Id not found");
         }
         return addr;
     }
@@ -207,11 +208,11 @@ struct Mem {
         auto addr = pvalue::template get<memType, memSize>(env);
         // Checking if address matches with unsigned version of memType.
         if (addr < 0) {
-            throw "Invalid address";
+            throw std::range_error("Invalid address");
         }
         if (static_cast<typename std::make_unsigned<decltype(addr)>::type>(addr) >
             std::numeric_limits<typename std::make_unsigned<memType>::type>::max()) {
-            throw "Index for an array exceeds Computer's memory type max value";
+            throw std::range_error("Index for an array exceeds Computer's memory type max value");
         }
         return &(env.memory[addr]);
     }
@@ -222,11 +223,11 @@ struct Mem {
         auto addr = pvalue::template get<memType, memSize>(env);
         // Checking if address matches with unsigned version of memType.
         if (addr < 0) {
-            throw "Invalid address";
+            throw std::range_error("Invalid address");
         }
         if (static_cast<typename std::make_unsigned<decltype(addr)>::type>(addr) >
             std::numeric_limits<typename std::make_unsigned<memType>::type>::max()) {
-            throw "Index for an array exceeds Computer's memory type max value";
+            throw std::range_error("Index for an array exceeds Computer's memory type max value");
         }
         return env.memory[addr];
     }
